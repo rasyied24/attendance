@@ -1,0 +1,36 @@
+services:
+  database_container:
+    build:
+      context: .
+      dockerfile: /container/database.dockerfile
+    ports:
+      - "6543:5432"
+    env_file:
+      - ./environtments/database.env
+    volumes:
+      - database_volume:/var/lib/postgresql/data
+  attendance_container:
+    build: 
+      context: .
+      dockerfile: /container/php.dockerfile
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./environtments/php.env
+    volumes:
+      - attendance_volume:/var/www/html
+    depends_on:
+      - database_container
+  attendance_server:
+    build:
+      context: .
+      dockerfile: /container/web_server.dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - database_container
+      - attendance_container
+
+volumes:
+  database_volume:
+  attendance_volume:
